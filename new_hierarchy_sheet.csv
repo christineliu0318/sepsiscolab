@@ -1,0 +1,55 @@
+﻿N1,N2,N3,Grouping
+Environment,,,Facility
+Environment,Facility,,Population
+Medical Care,,,Diagnosis
+Environment,Resources,,Blood
+Medical Care,,,Discharge Care
+Environment,Infrastructure,Outpatient Department,OPD Layout
+Environment,Infrastructure,ER,ER Layout
+Environment,Infrastructure,ER,ER Triage
+Environment,Infrastructure,Outpatient Department,OPD Triage
+Environment,Infrastructure,Pediatric,Ped Layout
+Environment,Infrastructure,Pediatric,Ped Triage
+Environment,Facility,,Operating Time
+Environment,Infrastructure,ER,ER Power
+Environment,Infrastructure,Outpatient Department,OPD Power
+Environment,Infrastructure,Pediatric,Ped Power
+Environment,Facility,,Power
+Environment,Infrastructure,ER,ER Hygiene
+Environment,Infrastructure,Outpatient Department,OPD Hygiene
+Environment,Infrastructure,Pediatric,Ped Hygiene
+Environment,Resources,,Refrigeration
+Environment,Facility,,Communication
+Environment,Facility,,Transportation
+Environment,Facility,,Hygiene
+Environment,Resources,,Processing Equipment
+Environment,Facility,,Staff
+Environment,Infrastructure,ER,ER Equipment
+Environment,Infrastructure,ER,ER Medication
+Environment,Infrastructure,Pediatric,Ped Medication
+Environment,Resources,Medications,Pharmacy Medication
+Environment,Resources,Medications,Supply Medication
+Environment,Infrastructure,Pediatric,Ped Equipment
+Environment,Resources,,Lab Equipment
+Environment,Resources,,Tests Available
+Environment,Resources,,Imaging
+Environment,Facility,,Job Aides
+Environment,Facility,,Standards of Care
+Medical Care,Pneumonia,,PNA History
+Medical Care,Pneumonia,,PNA Exam
+Medical Care,Pneumonia,,PNA Investigation
+Medical Care,Pneumonia,,PNA Monitoring
+Medical Care,Pneumonia,,PNA Treatment
+Medical Care,Pneumonia,,PNA Followup
+Medical Care,Diarrhea,,DIA History
+Medical Care,Diarrhea,,DIA Exam
+Medical Care,Diarrhea,,DIA Diagnosis
+Medical Care,Diarrhea,,DIA Monitoring
+Medical Care,Diarrhea,,DIA Treatment
+Medical Care,Diarrhea,,DIA Followup
+Medical Care,Malaria,,MAL History
+Medical Care,Malaria,,MAL Exam
+Medical Care,Malaria,,MAL Investigation
+Medical Care,Malaria,,MAL Monitoring
+Medical Care,Malaria,,MAL Treatment
+Medical Care,Malaria,,MAL Followup

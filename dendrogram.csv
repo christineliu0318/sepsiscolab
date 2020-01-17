@@ -1,0 +1,65 @@
+﻿from,to
+Diarrhea,DIA History
+Diarrhea,DIA Exam
+Diarrhea,DIA Diagnosis
+Diarrhea,DIA Monitoring
+Diarrhea,DIA Treatment
+Diarrhea,DIA Followup
+Environment,Resources
+Environment,Infrastructure
+Environment,Facility
+ER,ER Equipment
+ER,ER Medication
+ER,ER Hygiene
+ER,ER Power
+ER,ER Layout
+ER,ER Triage
+Facility,Job Aides
+Facility,Standards of Care
+Facility,Communication
+Facility,Transportation
+Facility,Hygiene
+Facility,Staff
+Facility,Power
+Facility,Operating Time
+Facility,Population
+Hospital,Environment
+Hospital,Medical Care
+Infrastructure,Pediatric
+Infrastructure,ER
+Infrastructure,Outpatient Department
+Malaria,MAL History
+Malaria,MAL Exam
+Malaria,MAL Investigation
+Malaria,MAL Monitoring
+Malaria,MAL Treatment
+Malaria,MAL Followup
+Medical Care ,Pneumonia
+Medical Care ,Malaria
+Medical Care ,Diarrhea
+Medical Care ,Diagnosis
+Medical Care ,Discharge Care
+Medications,Pharmacy Medication
+Medications,Supply Medication
+Outpatient Department,OPD Hygiene
+Outpatient Department,OPD Power
+Outpatient Department,OPD Layout
+Outpatient Department,OPD Triage
+Pediatric,Ped Medication
+Pediatric,Ped Equipment
+Pediatric,Ped Hygiene
+Pediatric,Ped Power
+Pediatric,Ped Layout
+Pediatric,Ped Triage
+Pneumonia,PNA Investigation
+Pneumonia,PNA Monitoring
+Pneumonia,PNA Treatment
+Pneumonia,PNA Followup
+Resources,Lab Equipment
+Resources,Tests Available
+Resources,Imaging
+Resources,Medications
+Resources,Medications
+Resources,Refrigeration
+Resources,Processing Equipment
+Resources,Blood

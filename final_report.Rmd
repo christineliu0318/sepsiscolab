@@ -1,0 +1,805 @@
+---
+title: |
+  | \vspace{5cm}\LARGE Health Facility Environmental Scan: Evaluating the Quality of Care Delivered to Critically Ill Children in Hospital 
+
+output:
+  pdf_document: 
+    df_print: kable
+    toc: true
+    toc_depth: 5
+    latex_engine: pdflatex
+    keep_tex: true
+keep_md: yes
+geometry: margin=0.3in
+sansfont: Arial
+fontsize: 10pt
+header-includes:
+  \usepackage{makecell}
+  \usepackage{longtable}
+  \usepackage{wrapfig}
+  \usepackage{float}
+---
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source('final_functions.R')
+devtools::source_gist("c83e078bf8c81b035e32c3fc0cf04ee8", 
+                      filename = 'render_toc.R')
+```
+
+```{r include = FALSE, results = 'hide', echo=FALSE}
+#User input to generate graph. Each survey has a coding csv and a hierarchy csv.
+record <- 1
+coding_sheet <- "new_coding_sheet.csv"
+token <- "3668BACBB5255EE7B31A49E4880F6CA9"
+hierarchy <- 'new_hierarchy_sheet.csv'
+
+#Load the master dataframe from which we will pull data
+df <- export_merge(record, coding_sheet, token)
+
+
+#Score each question. The function is put here because the way scoring works may change.
+df <- df %>%
+   mutate(Score = case_when(
+      Input == 'Always available (no interruptions)' | Input == 'Observed in range' | Input == 'Yes, observed' | Input == 'Available and functional' | Input == 'Observed' | Input == 'Available all the time' | Input == 'Present, useful' | Input == 'Both (Asked and Documented)' | Input == 'Both (Performed and Documented)' | Input == 'Both (Observed and Recorded)' | Input == 'Available, and functional' ~ '2' ,
+      
+     Input == 'Yes' | Input == 'Checked' | Input == 'Sometimes available (frequent or prolonged interruptions of more than 2 hours per day)' | Input == 'Often available (interruptions of less than 2 hours per day)' | Input == 'Reported in range but not seen' | Input == 'Yes, reported, not seen' | Input == 'Available, not functioning' | Input == 'Available, don\'t know if functioning' | Input == 'Reported, not seen' | Input == 'Not available after office hours' | Input == 'Present, not helpful' | Input == 'Asked, only' | Input == 'Performed, only' | Input == 'Observed, only' ~ '1',
+     
+     Input == 'No' | Input == 'Unchecked' | Input == 'Out of range' | Input == 'Record not available' | Input == 'Not available' | Input == 'Not available at all' | Input == 'Not present' | Input == 'None' ~ '0',
+     
+     Input == 'Not applicable' ~ 'NA',
+   ))
+    
+
+#Cumulative scores from sum of each subcategory in a dataframe. This is used in creating graphs.
+tree_df <- make_tree_df(hierarchy, df)
+
+#Create a data tree of each grouping with max and sum.
+dt <- create_tree(tree_df)
+
+#Dataframe of the groupings and their "Max" and "Sum"
+groups_df <- ToDataFrameNetwork(dt, 'Sum', 'Max', direction='climb')
+
+```
+
+
+\centering
+
+\vspace{5cm}\large
+**`r {df$Input[df$'Field Name' == 'city']}`, `r {df$Input[df$'Field Name' == 'country']}`**  
+\large
+**Facility: `r  {df$Input[df$'Field Name' == 'name_facility']}`**  
+\large
+**Date of Assessment: Environmental Scan `r {df$Input[df$'Field Name' == 'date_assessment']}` Observational Scan `r {df$Input[df$'Field Name' == 'dateofassessment']}`**  
+\large
+**Assessor: `r {df$Input[df$'Field Name'=='external_internal']}`**  
+\large
+**Designation: `r {df$Input[df$'Field Name'=='position_assessor']}`**  
+
+\newpage
+
+# Introduction
+
+\raggedright
+
+This environmental scan is a method for evaluating the quality of care delivered to critically ill children at health facilities. It was developed by the Pediatric Sepsis CoLaboratory and the British Columbia Children’s Hospital’s Centre for International Child Health in partnership with the World Federation of Intensive and Critical Care Societies (WFPICCS), and in close collaboration with partners and child health 
+programs in countries.  
+This survey combines elements from other surveys and instruments including WHO, SARA, and various publications. The health facility survey has been reviewed by experts caring for critically ill children from around the globe.  
+The purpose of this environmental scan is to support health facilities in identifying and assessing quality improvement (QI) priorities and initiatives. QI is a proven, effective way to improve care for patients and to improve practice for health workers. In the healthcare system, there are always opportunities to optimize, streamline, develop and test processes. This tool can be used (1) as a practical method to 
+collect baseline facility and health worker performance data, (2) periodically over time to assess the impact of changes made through the QI process, and (3) as a research tool to compare quality of care across a geographical region or set of facilities.  
+This survey measures facility resources in a number of areas, for example; infection control, facility infrastructure, and availability of essential medicines. The survey also measures health workers practices in areas such as history taking, physical examinations and treatment practices.
+
+\centering
+
+# Modules 
+
+\raggedright
+
+There are 4 modules within the environmental scan. For best results, it is advised to do them in the following order and have all completed. However, only 2 of these modules were complete for this assessment (module 1 and 2). Modules 3 and 4 will be completed at a later date.   
+
+**Module 1: Health Facility Survey of Facility Resources**  
+The health facility survey gathers information regarding (1) the availability of resources and services in the health facility and (2) the readiness of the health facility to provide specific services to a defined minimum standard.  
+
+**Module 2: Observational Scan of Health Worker Practices**  
+The observational scan assesses the quality and safety of care through observation of a health worker in suspected cases of pneumonia, diarrhea, and malaria, in order to assess adherence to standards in the patient care process. The assessor observes a health worker through five patient phases: medical history, physical examination, laboratory investigations, treatment and post-treatment.  
+
+**Module 3: Health Worker Perception Survey**  
+The health worker perception survey is a questionnaire for the health worker to assess their views of the quality of care provided at the facility.  
+
+**Module 4: Patient/Caretaker Perception Survey**  
+The caretaker perception survey assesses the caretaker’s view of the quality of care they received while at the facility. Through completing all 4 modules, the Scan is able to provide a holistic review of the quality of care provided to patients and areas of which should be prioritized for quality improvement. 
+
+\newpage
+
+\centering
+
+# Overall groupings
+
+```{r fig.align='center', out.height='100%', echo=FALSE}
+include_graphics('dendrogram.jpg')
+```
+
+The environmental and observational surveys assessed measured related to hospital environment and medical care. Above is a guide to the categories assessed. Detailed breakdowns of each of these subsections can be found on the following pages. 
+
+\newpage
+
+# PART 1: Environmental Survey
+\raggedright
+## Summary
+
+Below is an overview of your hospital's performance based upon our survey categorization.The environmental survey broadly categorized the survey questions into the categories of Resrouces, Infrastructure, or Facility.
+```{r echo=FALSE, message=FALSE, warning= FALSE, include=FALSE}
+#Make plotly for "Environment"
+environment_df <- make_radar_graph('Environment', groups_df) 
+plotly:: orca(environment_df, file = 'Environment.png')
+
+#Make horizontal bar graphs (inidividual for Pediatric, Outpatient, ER, Resources, Infrastructure, Facility)
+r <- make_graph('Resources',groups_df, 'orange')
+plotly:: orca(r, file = 'Resources.png')
+#Make plotly for "Infrastructure"
+i <- make_graph('Infrastructure', groups_df, 'blue')
+plotly:: orca(i, file = 'Infrastructure.png')
+#Make plotly for "Facility"
+f <- make_graph('Facility', groups_df, 'purple')
+plotly:: orca(f, file = 'Facility.png')
+
+#Group the above three graphs into one
+r_f_i_subplot <- subplot(r,i,f, shareX = TRUE, nrows=3, heights = c(0.4,0.2,0.4)) %>% 
+  layout(
+    showlegend = FALSE,
+    title = '',
+    font = list(size=12)
+    )
+plotly:: orca(r_f_i_subplot, file = 'r_f_i_.png')
+png <- image_read('r_f_i_.png')
+image_scale(png, "x650")
+image_trim(png)
+
+#Make horizontal bar graphs (inidividual for Pediatric, Outpatient, ER)
+p <- make_graph('Pediatric',groups_df, 'orange')
+plotly:: orca(r, file = 'Pediatric.png')
+#Make plotly for "Outpatient Department"
+e <- make_graph('Outpatient Department', groups_df, 'blue')
+plotly:: orca(i, file = 'Outpatient Department.png')
+#Make plotly for "ER"
+o <- make_graph('ER', groups_df, 'purple')
+plotly:: orca(f, file = 'ER.png')
+
+#Group the above three graphs into one
+p_o_e_subplot <- subplot(p,o,e, shareX = TRUE, nrows=3, heights = c(0.4,0.4,0.2)) %>% 
+  layout(
+    showlegend = FALSE,
+    title = '',
+    font = list(size=12)
+    )
+plotly:: orca(p_o_e_subplot, file = 'p_o_e_.png')
+png1 <- image_read('p_o_e_.png')
+image_scale(png1, "x650")
+image_trim(png1)
+
+
+combined_subplot <- subplot(p_o_e_subplot,r_f_i_subplot, nrows=1, margin = 0.08, widths = c(0.5,0.5)) %>% 
+  layout(
+    showlegend = FALSE,
+    title = '',
+    font = list(size=12),
+    annotations = list(
+  x = 0.5,
+  y = -0.2,
+  showarrow=F,
+  xref = "paper",
+  yref = "paper"
+)
+    )
+plotly:: orca(combined_subplot, file = 'combined.png')
+
+```
+
+```{r echo=FALSE, out.width='50%', out.height='50%', echo=FALSE, fig.show='hold', fig.align='center'}
+include_graphics('Environment.png')
+```
+\centering
+```{r echo=FALSE, out.width='100%', out.height='40%', fig.show='hold', fig.align='center'}
+include_graphics('combined.png')
+```
+\raggedright
+**Resource** subcategories examined your institution's test availability, processing equipment, lab equipment, refrigeration, pharmacy/supply room medication stock, imaging capabilities, and availability of blood products.  
+**Facility** subcategories examined your institution's hospital transportation equipment, communications infrastructure, utilities availability, presence of job aides, and hygiene standards.    
+**Infrastructure** section examines three department areas of your hospital: ER, Pediatric Ward, and the Outpatient Department. Each of these areas are further subdivided into layout, triage protocols, power/utilities, hygiene standards, medication & equipment availability.
+
+
+\newpage
+\centering
+## Facility
+
+
+\raggedright
+### Demographics 
+     
+Age range in years of children cared for at this hospital: `r  {df$Input[df$'Field Name' == 'definition_child']}`
+```{r echo=FALSE, results='asis', out.height='70%', out.width='70%'}
+df <- as_tibble(df)
+df$Input <-as.character(df$Input)
+if (toString(df$Input[df$'Field Name' == 'disaggregate_age']) == '1' | toString(df$Input[df$'Field Name' == 'disaggregate_age']) == 'NA'){
+ demographics <- large_demographic_chart(df)
+} else {
+ demographics <- small_demographic_chart(df)
+}
+plotly:: orca(demographics, file = 'demographics.png')
+```
+
+```{r fig.align='center', echo=FALSE}
+image_read('demographics.png') %>% image_trim() %>% image_scale('400')
+```
+
+### Operating Hours
+```{r echo=FALSE}
+er_24 <- if (df$Input[df$'Field Name' == 'operating_time_4'] == 'Yes') {"The emergency department is open 24 hours."} else {"The emergency department is not open 24 hours."}
+```
+This facility is open `r {df$Input[df$'Field Name' == 'operating_time_5']}` days(s) of the week.  
+Operating hours: `r {df$Input[df$'Field Name' == 'er_operating_hours']}`  
+`r { paste(er_24) }`  
+The pediatric outpatient/IMCI corner starts at: `r {df$Input[df$'Field Name' == 'operating_time_1']}` and ends at `r {df$Input[df$'Field Name' == 'operating_time_2']}`
+
+### Staff  
+```{r echo = FALSE}
+staff_table <- df %>% dplyr::filter(Grouping == "Staff") %>% dplyr::select(Question, Input)
+
+staff_table %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8)
+
+```
+
+### Power
+During the past 7 days, was electricity available at all times from the main or back-up source when the facility was open for services? `r {df$Input[df$'Field Name' == 'power_supply_9']}`
+
+### Communication   \newline
+The following items were checked as complete. 
+`r {good_table('Communication')}`
+The following items were marked as not available.
+`r {bad_table('Communication')}`
+
+### Transportation  
+The following items were checked as complete.
+`r {good_table('Transportation')}`
+The following items were marked as not available.
+`r {bad_table('Transportation')}`
+
+### Hygiene   \newline
+The following items were checked as complete. 
+`r {good_table('Hygiene')}`
+The following items were marked as not available.
+`r {bad_table('Hygiene')}`
+
+**Notes**  
+* Frequency and method of medical waste disposal: `r {df$Input[df$'Field Name' == 'medical_waste_2']}` 
+
+### Job Aides \newline
+The following items were checked as complete. 
+`r {good_table('Job Aides')}`
+The following items were marked as not available.
+`r {bad_table('Job Aides')}`
+
+### Standards of Care  \newline
+The following items were checked as complete. 
+`r {good_table('Standards of Care')}`
+The following items were marked as not available.
+`r {bad_table('Standards of Care')}`
+
+\newpage 
+
+## Resources 
+
+### Blood Services   
+
+The following items were checked as complete. 
+`r {good_table('Blood')}`
+The following items were marked as not available.
+`r {bad_table('Blood')}`
+
+### Refrigeration   
+
+What following device(s) for monitoring refrigerator temperature are available and functioning in the refrigerator today? `r {df$Input[df$'Field Name' == 'refrigeration_vaccines_4___1']}` 
+
+The following items were checked as complete. 
+`r {good_table('Refrigeration')}`
+The following items were marked as not available.
+`r {bad_table('Refrigeration')}`
+
+### Imaging   
+The following items were checked as complete.   
+`r {good_table('Imaging')}`  
+The following items were marked as not available.   
+`r {bad_table('Imaging')}`    
+
+### Lab Equipment   
+The following items were checked as available. 
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+equipment <- tibble('Equipment Availability' = 1:1, 'Comments' = "")
+l <- (groups_df$Sum[groups_df$'to' == 'Lab Equipment']/groups_df$Max[groups_df$'to' == 'Lab Equipment'])*100
+equipment[1,1] <- paste(paste('(',groups_df$Sum[groups_df$'to' == 'Lab Equipment']/2,'/', groups_df$Max[groups_df$'to' == 'Lab Equipment']/2, ')',  format(round(l, 2), nsmall = 2), '%', sep=''), 'Lab Equipment are available and functional', sep = ' ')
+
+equipment %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = 'hold_position', font_size = 8) %>%
+    row_spec (0, bold=T)
+``` 
+The following items were marked as not available.
+`r {bad_table('Lab Equipment')}`  
+
+### Medications   
+The following items were checked as available.  
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+medications <- tibble('Equipment Availability' = 1:2, 'Comments' = "")
+p <- (groups_df$Sum[groups_df$'to' == 'Pharmacy Medication']/groups_df$Max[groups_df$'to' == 'Pharmacy Medication'])*100
+s <- (groups_df$Sum[groups_df$'to' == 'Supply Medication']/groups_df$Max[groups_df$'to' == 'Supply Medication'])*100
+medications[1,1] <- paste(paste('(',groups_df$Sum[groups_df$'to' == 'Pharmacy Medication'],'/', groups_df$Max[groups_df$'to' == 'Pharmacy Medication'], ')',  format(round(p, 2), nsmall = 2), '%', sep=''), 'Pharmacy Medications are available and functional', sep = ' ')
+medications[2,1] <- paste(paste('(',groups_df$Sum[groups_df$'to' == 'Supply Medication'],'/', groups_df$Max[groups_df$'to' == 'Supply Medication'], ')',  format(round(s, 2), nsmall = 2), '%', sep=''), 'Supply Medications are available and functional', sep = ' ')
+
+medications %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = 'hold_position', font_size = 8) %>%
+    row_spec (0, bold=T)
+```
+The following items were marked as not available.  
+```{r echo = FALSE, results = 'asis'}
+  meds <- groups_df %>% dplyr:: filter(from == 'Medications') %>% dplyr::filter(Max != 0)
+  meds <- meds$to 
+  meds_bad <- tibble()
+  for (i in meds){
+    a <- df %>% dplyr:: filter(Grouping == i) %>% dplyr::filter(Max != 0)
+    t <- a %>% dplyr:: filter(Max > Score) %>% dplyr :: select (Grouping, Question)
+    t <- mutate(t, Comments='')
+    meds_bad <- dplyr:: bind_rows(meds_bad,t)
+  }
+ meds_bad$Question <- gsub("\\(.*", '', meds_bad$Question)
+  
+meds_bad %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8) %>%
+    column_spec(column = 1, width = '3cm') %>%
+    row_spec (0, bold=T) %>%
+    collapse_rows(columns = 1, latex_hline = "major", valign = "top")
+
+```
+
+### Processing Equipment  
+The following items were checked as complete.  
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+good_table('Processing Equipment')
+```
+The following items were marked as not available.     
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('Processing Equipment')
+``` 
+
+### Tests Available  
+The following items were checked as complete.
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+good_table('Tests Available')
+```
+The following items were marked as not available.
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('Tests Available')
+``` 
+
+\newpage
+
+## Infrastructure
+
+### Outpatient Department  
+
+a. Layout  
+The following items were checked as complete
+```{r echo = FALSE, results = 'asis'}
+good_table('OPD Layout')
+```
+The following items were checked as incomplete
+```{r echo = FALSE, results = 'asis'}
+bad_table('OPD Layout')
+```
+
+b. Triage
+
+```{r echo = FALSE}
+opdtriage_table <- df %>% dplyr::filter(Grouping == "OPD Triage") %>% dplyr::select(Question, Input)
+
+staff_table %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = 'HOLD_position', font_size = 8)
+```
+
+c. Power
+The following items were checked as complete
+```{r echo = FALSE, results = 'asis'}
+good_table('OPD Power')
+```
+The following items were checked as incomplete
+```{r echo = FALSE, results = 'asis'}
+bad_table('OPD Power')
+```
+
+d. Hygiene
+The following items were checked as complete
+```{r echo = FALSE, results = 'asis'}
+good_table('OPD Hygiene')
+```
+The following items were checked as incomplete
+```{r echo = FALSE, results = 'asis'}
+bad_table('OPD Hygiene')
+```
+
+
+### ER   
+
+a. Layout  
+The following items were checked as complete. 
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+good_table('ER Layout')
+```
+The following items were marked as incomplete.   
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('ER Layout')
+``` 
+b. Triage  
+
+Is there any system in place to prioritize severely ill children in the emergency department (e.g., triage system)? `r {df$Input[df$'Field Name' == 'patient_flow_22']}`   
+```{r echo=FALSE}
+triage_system <- if (df$Input[df$'Field Name' == 'patient_flow_22'] == 'Yes') {paste(df$Input[df$'Field Name' == 'patient_flow_3'], ".", sep='', collapse = NULL)}
+```
+`r {paste(triage_system)}`
+\newline
+The patient is initially assessed by a: `r {df$Input[df$'Field Name' == 'traige_treatment']}`
+\newline
+Other details: "`r {df$nput[df$'Field Name' == 'other_triage']}`
+
+c. Hygiene
+The following items were checked as complete.
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+good_table('ER Hygiene')
+```
+The following items were marked as not available.   
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('ER Hygiene')
+``` 
+
+d. Equipment
+The following items were checked as available.  
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+er_equipment <- tibble('Equipment Availability' = 1:1, 'Comments' = "")
+e <- (groups_df$Sum[groups_df$'to' == 'ER Equipment']/groups_df$Max[groups_df$'to' == 'ER Equipment'])*100
+er_equipment[1,1] <- paste(paste('(',groups_df$Sum[groups_df$'to' == 'ER Equipment']/2,'/', groups_df$Max[groups_df$'to' == 'ER Equipment']/2, ')',  format(round(e, 2), nsmall = 2), '%', sep=''), 'ER Equipment are available and functional', sep = ' ')
+
+
+er_equipment %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = 'hold_position', font_size = 8) %>%
+    row_spec (0, bold=T)
+```
+The following items were marked as not available.   
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('ER Equipment')
+``` 
+
+e. Medication
+The following items were checked as available.  
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+er_meds <- tibble('ER Medications' = 1:1, 'Comments' = "")
+em <- (groups_df$Sum[groups_df$'to' == 'ER Medication']/groups_df$Max[groups_df$'to' == 'ER Medication'])*100
+er_meds[1,1] <- paste(paste('(',groups_df$Sum[groups_df$'to' == 'ER Medication'],'/', groups_df$Max[groups_df$'to' == 'ER Medication'], ')',  format(round(p, 2), nsmall = 2), '%', sep=''), 'ER Medications are available and functional', sep = ' ')
+
+
+er_meds %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = 'hold_position', font_size = 8) %>%
+    row_spec (0, bold=T)
+```
+The following items were marked as not available.  
+```{r echo = FALSE, results = 'asis'}
+  er_bad_meds <- df %>% dplyr:: filter(Grouping == 'ER Medication') %>% dplyr::filter(Max != 0)
+  er_bad_meds <- er_bad_meds %>% dplyr:: filter(Max > Score) %>% dplyr :: select (Question, Input)
+  er_bad_meds <- mutate(er_bad_meds, Comments='')
+  er_bad_meds$Question <- gsub("\\(choice.*", '', er_bad_meds$Question)
+
+  
+  er_bad_meds %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8) %>%
+    column_spec(column = 1, width = '4cm') %>%
+    column_spec(column = 2, width = '4cm') %>%
+    row_spec (0, bold=T)
+```
+
+### Pediatric Ward
+
+a. Layout
+
+How many beds are there in the pediatric ward? `r {df$Input[df$'Field Name' == 'pd_ward_beds']}` 
+
+The following items were checked as complete.
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+good_table('Ped Layout')
+```
+The following items were marked as not available.   
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('Ped Layout')
+``` 
+
+b. Triage
+
+What is the triage arrangement in the pediatric ward for infectious cases? `r {df$Input[df$'Field Name' == 'infection_control_beds']}`
+
+What is the triage arrangement in the pediatric ward for surgical cases? `r {df$Input[df$'Field Name' == 'surgical_beds_2']}`
+
+The following items were checked as complete.
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+good_table('Ped Triage')
+```
+The following items were marked as not available.   
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('Ped Triage')
+``` 
+
+c. Power
+The following items were checked as complete.
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+good_table('Ped Power')
+```
+The following items were marked as not available.   
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('Ped Power')
+``` 
+
+d. Hygiene
+The following items were checked as complete.
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+good_table('Ped Hygiene')
+```
+The following items were marked as not available.   
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('Ped Hygiene')
+``` 
+
+e. Equipment
+The following items were checked as available.  
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+ped_equipment <- tibble('Equipment Availability' = 1:1, 'Comments' = "")
+ped_e <- (groups_df$Sum[groups_df$'to' == 'Ped Equipment']/groups_df$Max[groups_df$'to' == 'Ped Equipment'])*100
+ped_equipment[1,1] <- paste(paste('(',groups_df$Sum[groups_df$'to' == 'Ped Equipment']/2,'/', groups_df$Max[groups_df$'to' == 'Ped Equipment']/2, ')',  format(round(ped_e, 2), nsmall = 2), '%', sep=''), 'Pediatric Ward Equipment are available and functional', sep = ' ')
+
+
+ped_equipment %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = 'hold_position', font_size = 8) %>%
+    row_spec (0, bold=T)
+```
+The following items were marked as not available.   
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+bad_table('Ped Equipment')
+``` 
+f. Medication
+The following items were checked as available.  
+```{r echo = FALSE, results = 'asis', out.width='100%'}
+ped_meds <- tibble('Pediatric Medications' = 1:1, 'Comments' = "")
+pm <- (groups_df$Sum[groups_df$'to' == 'Ped Medication']/groups_df$Max[groups_df$'to' == 'Ped Medication'])*100
+ped_meds[1,1] <- paste(paste('(',groups_df$Sum[groups_df$'to' == 'Ped Medication'],'/', groups_df$Max[groups_df$'to' == 'Ped Medication'], ')',  format(round(pm, 2), nsmall = 2), '%', sep=''), 'Pediatric Ward Medications are available and functional', sep = ' ')
+
+
+ped_meds %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = 'hold_position', font_size = 8) %>%
+    row_spec (0, bold=T)
+```
+The following items were marked as not available.  
+```{r echo = FALSE, results = 'asis'}
+  ped_bad_meds <- df %>% dplyr:: filter(Grouping == 'Ped Medication') %>% dplyr::filter(Max != 0)
+  ped_bad_meds <- ped_bad_meds %>% dplyr:: filter(Max > Score) %>% dplyr :: select (Question, Input)
+  ped_bad_meds <- mutate(ped_bad_meds, Comments='')
+  ped_bad_meds$Question <- gsub("\\(choice.*", '', ped_bad_meds$Question)
+
+  
+  ped_bad_meds %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8) %>%
+    column_spec(column = 1, width = '4cm') %>%
+    column_spec(column = 2, width = '4cm') %>%
+    row_spec (0, bold=T)
+```
+\newpage
+
+# PART 2: Observational Survey
+
+## Diagnostic and Treatment services  
+```{r echo = FALSE}
+services <- list()
+if (df$Input[df$'Field Name' == 'prev_cur_services'] == 'Yes') {services <- append(services, "serious infection")}
+if (df$Input[df$'Field Name' == 'malaria_diagnose'] == 'Yes') {services <- append(services, "malaria")}
+if (df$Input[df$'Field Name' == 'pneumonia_diagnose'] == 'Yes') {services <- append(services, "pneumonia")}
+if (df$Input[df$'Field Name' == 'diarrhea_diagnose'] == 'Yes') {services <- append(services, "diarrhea")}
+if (df$Input[df$'Field Name' == 'meningitis_diagnose'] == 'Yes') {services <- append(services,"meningitis")}
+if (df$Input[df$'Field Name' == 'malnutrition_diagnose'] == 'Yes') {services <- append(services, "malnutrition")}
+if (df$Input[df$'Field Name' == 'extract_infection'] == 'Yes') {services <- append(services, "extracting'/draining sepsis infection")}
+
+```
+
+
+This hospital offers diagnostic and treatment services for: `r {paste(services,collapse=", ")}`. 
+
+Below is an overview of your hospital's performance based upon our survey categorization.
+```{r echo=FALSE}
+#Make plotly for "Process"
+process_df <- make_radar_graph('Medical Care', groups_df) 
+plotly:: orca(process_df, file = 'Medical Care.png')
+
+#Make plotly for "PNEUMONIA"
+pneumonia_df <- make_graph('Pneumonia',groups_df, 'orange')
+plotly:: orca(pneumonia_df, file = 'Pneumonia.png', width = 1200, height = 1600)
+#Make plotly for "DIARRHEA"
+diarrhea_df <- make_graph('Diarrhea', groups_df, 'green')
+plotly:: orca(diarrhea_df, file = 'Diarrhea.png', width = 1200, height = 1600)
+#Make plotly for "MALARIA"
+malaria_df <- make_graph('Malaria', groups_df,'blue')
+plotly:: orca(malaria_df, file = 'Malaria.png', width = 1200, height = 1600)
+#Combine both pneumonia and diarrhea graphs
+p_d_m_subplot <- subplot(pneumonia_df,diarrhea_df,malaria_df, shareX = TRUE, nrows=3) %>% 
+  layout(
+    showlegend = FALSE,
+    title = '',
+    font = list(size=12)
+    )
+plotly:: orca(p_d_m_subplot, file = 'p_d_m.png')
+```
+
+```{r fig.align='center', out.width='60%', out.height='60%', echo=FALSE}
+include_graphics('Medical Care.png')
+```
+
+```{r out.height= '50%', echo=FALSE}
+include_graphics('p_d_m.png')
+```
+
+\newpage 
+
+## Discharge Care  
+  
+Does this facility have referral clinics that follow-up children post-discharge?: `r {df$Input[df$'Field Name' == 'discharge_care']}`  
+The current discharge process is: `r {df$Input[df$'Field Name' == 'discharge_notes']}`  
+
+## Pneumonia
+
+The following items were marked as completed in treatment of pneumonia.
+```{r echo = FALSE, results = 'asis'}
+  c <- groups_df %>% dplyr:: filter(from == 'Pneumonia') %>% dplyr::filter(Max != 0)
+  c <- c$to 
+  pna_good <- tibble()
+  for (i in c){
+    a <- df %>% dplyr:: filter(Grouping == i) %>% dplyr::filter(Max != 0)
+    t <- a %>% dplyr:: filter(Max == Score) %>% dplyr :: select (Grouping, Question)
+    t <- mutate(t, Comments='')
+    pna_good <- dplyr:: bind_rows(pna_good,t)
+  }
+  
+  pna_good %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8) %>%
+    column_spec(column = 1, width = '3cm') %>%
+    column_spec(column = 2, width = '6cm') %>%
+    row_spec (0, bold=T) %>%
+    collapse_rows(columns = 1, latex_hline = "major", valign = "middle")
+
+```
+
+The following items were marked as incomplete in treatment of pneumonia.
+```{r echo = FALSE, results = 'asis'}
+  pna_bad <- tibble()
+  for (i in c){
+    a <- df %>% dplyr:: filter(Grouping == i) %>% dplyr::filter(Max != 0)
+    t <- a %>% dplyr:: filter(Max > Score) %>% dplyr :: select (Grouping, Question)
+    t <- mutate(t, Comments='')
+    pna_bad <- dplyr:: bind_rows(pna_bad,t)
+  }
+  
+  pna_bad %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8) %>%
+    column_spec(column = 1, width = '3cm') %>%
+    column_spec(column = 2, width = '6cm') %>%
+    row_spec (0, bold=T) %>%
+    collapse_rows(columns = 1, latex_hline = "major", valign = "middle")
+
+```
+
+**Notes**
+
+* Were any additional steps completed that are not listed above? `r {df$Input[df$'Field Name' == 'additional_notes']}`  
+
+\newpage
+
+## Malaria  
+
+```{r echo = FALSE}
+mal_treatment <- if (df$Input[df$'Field Name' == 'iv_quinine'] == 'Yes') {paste('IV Quinine')} else if (df$Input[df$'Field Name' == 'im_quinine'] == 'Yes') {paste('IM Quinine')} else if (df$Input[df$'Field Name' == 'im_artemether'] == 'Yes') {paste('IM Artemether')} else if (df$Input[df$'Field Name' == 'iv_artesunate'] == 'Yes') {paste('IV artesunate')}
+```
+Malaria was treated with: `r {mal_treatment}`
+
+The following items were marked as completed in treatment of malaria
+```{r echo = FALSE, results = 'asis'}
+  m <- groups_df %>% dplyr:: filter(from == 'Malaria') %>% dplyr::filter(Max != 0)
+  m <- m$to 
+  mal_good <- tibble()
+  for (i in m){
+    a <- df %>% dplyr:: filter(Grouping == i) %>% dplyr::filter(Max != 0)
+    t <- a %>% dplyr:: filter(Max == Score) %>% dplyr :: select (Grouping, Question)
+    t <- mutate(t, Comments='')
+    mal_good <- dplyr:: bind_rows(mal_good,t)
+  }
+  
+  mal_good %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8) %>%
+    column_spec(column = 1, width = '6cm') %>%
+    column_spec(column = 2, width = '3cm') %>%
+    row_spec (0, bold=T) %>%
+    collapse_rows(columns = 1, latex_hline = "major", valign = "middle")
+
+```
+
+The following items were marked as incomplete in treatment of malaria
+```{r echo = FALSE, results = 'asis'}
+  mal_bad <- tibble()
+  for (i in m){
+    a <- df %>% dplyr:: filter(Grouping == i) %>% dplyr::filter(Max != 0)
+    t <- a %>% dplyr:: filter(Max > Score) %>% dplyr :: select (Grouping, Question)
+    t <- mutate(t, Comments='')
+    mal_bad <- dplyr:: bind_rows(mal_bad,t)
+  }
+  
+  mal_bad %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8) %>%
+    column_spec(column = 1, width = '3cm') %>%
+    column_spec(column = 2, width = '6cm') %>%
+    row_spec (0, bold=T) %>%
+    collapse_rows(columns = 1, latex_hline = "major", valign = "middle")
+
+```
+
+**Notes**
+
+* Were any additional steps completed that are not listed above? `r {df$Input[df$'Field Name' == 'additional_notes_diarrhea']}`  
+
+* Were any additional questions or concerns? `r {df$Input[df$'Field Name' == 'additional_questions']}`  
+
+\newpage
+
+## Diarrhea
+
+The following items were marked as completed in treatment of diarrhea
+```{r echo = FALSE, results = 'asis'}
+  d <- groups_df %>% dplyr:: filter(from == 'Diarrhea') %>% dplyr::filter(Max != 0)
+  d <- d$to 
+  dia_good <- tibble()
+  for (i in d){
+    a <- df %>% dplyr:: filter(Grouping == i) %>% dplyr::filter(Max != 0)
+    t <- a %>% dplyr:: filter(Max == Score) %>% dplyr :: select (Grouping, Question)
+    t <- mutate(t, Comments='')
+    dia_good <- dplyr:: bind_rows(dia_good,t)
+  }
+  
+  dia_good %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8) %>%
+    column_spec(column = 1, width = '6cm') %>%
+    column_spec(column = 2, width = '3cm') %>%
+    row_spec (0, bold=T) %>%
+    collapse_rows(columns = 1, latex_hline = "major", valign = "middle")
+
+```
+
+The following items were marked as incomplete in treatment of diarrhea.
+```{r echo = FALSE, results = 'asis'}
+  dia_bad <- tibble()
+  for (i in d){
+    a <- df %>% dplyr:: filter(Grouping == i) %>% dplyr::filter(Max != 0)
+    t <- a %>% dplyr:: filter(Max > Score) %>% dplyr :: select (Grouping, Question)
+    t <- mutate(t, Comments='')
+    dia_bad <- dplyr:: bind_rows(dia_bad,t)
+  }
+  
+  dia_bad %>% kable('latex', booktabs = F, longtable = T) %>%
+    kable_styling(full_width = T, latex_options = c('hold'), font_size = 8) %>%
+    column_spec(column = 1, width = '6cm') %>%
+    column_spec(column = 2, width = '3cm') %>%
+    row_spec (0, bold=T) %>%
+    collapse_rows(columns = 1, latex_hline = "major", valign = "middle")
+
+```
+
+**Notes**
+
+* Were any additional steps completed that are not listed above? `r {df$Input[df$'Field Name' == 'additional_notes_diarrhea']}`  
+
